@@ -43,7 +43,7 @@ class SavingsAccount(Account):
         if self.balance - amount < self.min_balance:
             raise ValueError("Withdrawal exceeds allowed minimum balance.")
         else:
-            super().withdraw(amount)
+            super().withdraw(amount)  # Update the balance after successful withdrawal
 
 # Update the withdraw method in the CheckingAccount class
 class CheckingAccount(Account):
@@ -162,7 +162,7 @@ class Program:
 
         try:
             if account_type == 'savings':
-                min_balance = float(input("Enter minimum balance: "))
+                min_balance = float(input("Enter minimum balance (recomended 0): "))
                 account = self.bank.open_account(account_number, account_type, min_balance=min_balance)
             elif account_type == 'checking':
                 overdraft_limit = float(input("Enter overdraft limit: "))
