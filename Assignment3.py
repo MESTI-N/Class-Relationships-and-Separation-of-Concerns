@@ -69,9 +69,9 @@ class Bank:
 
     def open_account(self, account_number: str, account_type: str = 'Savings'):
         if account_number not in self.accounts:
-            if account_type == 'Savings':
+            if account_type == 'savings':
                 account = SavingsAccount(account_number)
-            elif account_type == 'Checking':
+            elif account_type == 'checking':
                 account = CheckingAccount(account_number)
             else:
                 raise ValueError("Invalid account type")
@@ -89,44 +89,47 @@ class Program:
 
     def run(self):
         while True:
-            print("Banking Menu:")
-            print("1. Open Account")
-            print("2. Select Account")
-            print("3. Exit")
+            self.showMainMenu()
 
-            choice = input("Enter your choice: ")
-            if choice == '1':
-                self.open_account()
-            elif choice == '2':
-                self.select_account()
-            elif choice == '3':
-                print("Exiting the application. Goodbye!")
-                break
-            else:
-                print("Invalid choice. Please try again.")
+    def showMainMenu(self):
+        print("Main Menu:")
+        print("1. Open Account")
+        print("2. Select Account")
+        print("3. Exit")
 
-    def open_account(self):
+        choice = input("Enter your choice: ").lower()
+        if choice == '1':
+            self.openAccount()
+        elif choice == '2':
+            self.selectAccount()
+        elif choice == '3':
+            print("Exiting the application. Goodbye!")
+            exit()
+        else:
+            print("Invalid choice. Please try again.")
+
+    def openAccount(self):
         account_number = input("Enter account number: ")
-        account_type = input("Enter account type (Savings/Checking): ")
+        account_type = input("Enter account type (Savings/Checking): ").lower()
 
         try:
             account = self.bank.open_account(account_number, account_type)
             print(f"Account {account.get_account_number()} opened successfully.")
-        except ValueError as e:
-            print(f"Error: {e}")
+        except ValueError:
+            print("An error has come up")
 
-    def select_account(self):
+    def selectAccount(self):
         account_number = input("Enter account number: ")
         account = self.bank.search_account(account_number)
 
         if account:
             print(f"Account {account.get_account_number()} selected.")
             self.selected_account = account
-            self.show_account_menu()
+            self.showAccountMenu()
         else:
             print("Account not found.")
 
-    def show_account_menu(self):
+    def showAccountMenu(self):
         while True:
             print("Account Menu:")
             print("1. Check Balance")
@@ -134,9 +137,9 @@ class Program:
             print("3. Withdraw")
             print("4. Exit Account")
 
-            choice = input("Enter your choice: ")
+            choice = input("Enter your choice: ").lower()
             if choice == '1':
-                self.check_balance()
+                self.checkBalance()
             elif choice == '2':
                 self.deposit()
             elif choice == '3':
@@ -147,7 +150,7 @@ class Program:
             else:
                 print("Invalid choice. Please try again.")
 
-    def check_balance(self):
+    def checkBalance(self):
         print(f"Account Balance: ${self.selected_account.get_current_balance()}")
 
     def deposit(self):
