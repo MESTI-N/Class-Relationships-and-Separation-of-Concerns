@@ -37,24 +37,28 @@ class SavingsAccount(Account):
         self.min_balance = min_balance
 
     def withdraw(self, amount: float):
+        if amount < 0:
+            raise ValueError("Withdrawal amount must be positive.")
+
         if self.balance - amount < self.min_balance:
             raise ValueError("Withdrawal exceeds allowed minimum balance.")
         else:
             super().withdraw(amount)
 
-# Define a subclass for checking accounts
+# Update the withdraw method in the CheckingAccount class
 class CheckingAccount(Account):
     def __init__(self, account_number, balance=0, overdraft_limit=0):
         super().__init__(account_number, balance)
         self.overdraft_limit = overdraft_limit
 
     def withdraw(self, amount: float):
+        if amount < 0:
+            raise ValueError("Withdrawal amount must be positive.")
+
         if self.balance - amount < -self.overdraft_limit:
             raise ValueError("Withdrawal exceeds allowed overdraft limit.")
-        super().withdraw(amount)
-
-    def placeholder_method(self):
-        pass
+        else:
+            self.balance -= amount
 
 
 # Define the Bank class to manage accounts
@@ -93,7 +97,7 @@ class Program:
         self.selected_account = None
 
     def run(self):
-            self.show_main_menu()
+        self.show_main_menu()
 
     def show_main_menu(self):
         while True:
@@ -102,19 +106,24 @@ class Program:
             print("2. Select Account")
             print("3. Exit")
 
-            choice = input("Enter your choice: ").lower()
+            choice = input("Enter your choice: ")
             if choice == '1':
                 self.open_account()  # Bonus feature
             elif choice == '2':
                 self.select_account()
             elif choice == '3':
                 print("Exiting the application. Goodbye!")
-                return  # This will exit the show_main_menu method
+                return   # This will exit the show_main_menu method
             else:
                 print("Invalid choice. Please try again.")
 
     def show_account_menu(self):
         while True:
+            if self.selected_account is None:
+                print("You don't have an account selected. Please select an account first.")
+                self.show_main_menu()  # Go back to the main menu to select an account
+                break
+
             print("Account Menu:")
             print("1. Check Balance")
             print("2. Deposit")
@@ -130,9 +139,22 @@ class Program:
                 self.withdraw()
             elif choice == '4':
                 print("Exiting Account Menu.")
-                break
+                self.show_main_menu()  # Go back to the main menu
+                return
             else:
                 print("Invalid choice. Please try again.")
+
+    def select_account(self):
+        account_number = input("Enter account number to select: ")
+        account = self.bank.search_account(account_number)
+
+        if account:
+            print(f"Account {account_number} selected.")
+            self.selected_account = account
+            self.show_account_menu()
+        else:
+            print(f"Account {account_number} not found. Please try again.")
+            self.show_main_menu()  # Go back to the main menu
 
     def open_account(self):
         account_number = input("Enter account number: ")
@@ -151,8 +173,31 @@ class Program:
             print(f"Account {account.get_account_number()} opened successfully.")
             self.selected_account = account  # Select the newly opened account
             self.show_account_menu()  # Show the account menu
-        except ValueError as e:
-            print(f"Error: {e}")
+        except ValueError:
+            print("Error")
+
+    def check_balance(self):
+        print(f"Account Balance: ${self.selected_account.get_current_balance()}")
+
+    def deposit(self):
+        try:
+            amount = float(input("Enter amount to deposit: "))
+            self.selected_account.deposit(amount)
+            print("Deposit successful.")
+        except ValueError:
+            print("Error")
+
+    def withdraw(self):
+        try:
+            amount = float(input("Enter amount to withdraw: "))
+            if self.selected_account.get_current_balance() >= amount:
+                self.selected_account.withdraw(amount)
+                print("Withdrawal successful.")
+            else:
+                print("Insufficient funds. Withdrawal canceled.")
+        except ValueError:
+            print("Error")
+
 
 # Example usage
 if __name__ == "__main__":
