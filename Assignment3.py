@@ -93,7 +93,6 @@ class Program:
         self.selected_account = None
 
     def run(self):
-        while True:
             self.show_main_menu()
 
     def show_main_menu(self):
